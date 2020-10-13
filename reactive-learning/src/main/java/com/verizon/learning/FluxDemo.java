@@ -2,7 +2,7 @@ package com.verizon.learning;
 
 import reactor.core.publisher.Flux;
 
-import java.lang.reflect.Array;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -15,7 +15,6 @@ public class FluxDemo {
 
         List<String> values = new ArrayList<String>();
         Collections.sort(values);
-
 
 
         Flux<Integer> intFlux = Flux.range(0, 10);
@@ -36,7 +35,7 @@ public class FluxDemo {
         //
         //Flux<String> fluxOfString3 = Flux.fromArray(array)
 
-//        Flux<Long> longFlux = Flux.interval(ofSeconds(1));
+        Flux<Long> longFlux = Flux.interval(Duration.ofSeconds(1));
 
 
     }

@@ -46,7 +46,6 @@ public class ParallelSchedulerDemo {
 		cdl.await();
 		long end = System.currentTimeMillis();
 		System.out.println("Total time taken :" + (end - start));
-		Thread.sleep(10000);
 
 	}
 
