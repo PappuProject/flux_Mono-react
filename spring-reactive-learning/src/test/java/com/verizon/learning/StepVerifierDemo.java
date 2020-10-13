@@ -22,28 +22,31 @@ public class StepVerifierDemo {
 					.expectNext(4)
 					.verifyComplete();
 		// @formatter:on
-		
+
 	}
+
 	@Test
 	public void when_expectcount() {
-		
+
 		Flux<Integer> f0 = Flux.range(0, 5);
 		// @formatter:off
 		
 		StepVerifier.create(f0)
 		.expectSubscription()
-		.expectNextCount(5)
+		.expectNext(1, 2,3, 4,5)		
+		.verifyComplete();
+		
+		StepVerifier.create(f0)
+		.expectSubscription()
 		.verifyComplete();
 		// @formatter:on
-		
+
 	}
-	
+
 	@Test
 	public void when_using_map() {
-		
-		Flux<Integer> f0 = Flux
-				           .range(0, 5)
-				           .map(x -> x + 1);
+
+		Flux<Integer> f0 = Flux.range(0, 5).map(x -> x + 1);
 		// @formatter:off
 		
 		StepVerifier.create(f0)
@@ -55,16 +58,13 @@ public class StepVerifierDemo {
 		.expectNext(5)
 		.verifyComplete();
 		// @formatter:on
-		
+
 	}
-	
+
 	@Test
 	public void when_using_map_and_filter() {
-		
-		Flux<Integer> f0 = Flux
-				.range(0, 5)
-				.map(x -> x + 1)
-				.filter(x -> x > 3);
+
+		Flux<Integer> f0 = Flux.range(0, 5).map(x -> x + 1).filter(x -> x > 3);
 		// @formatter:off
 		
 		StepVerifier.create(f0)
@@ -74,7 +74,7 @@ public class StepVerifierDemo {
 		
 		.verifyComplete();
 		// @formatter:on
-		
+
 	}
 
 }
