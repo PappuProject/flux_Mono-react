@@ -38,8 +38,6 @@ public class MapAndFlatMapDemo {
         }
 
 
-
-
 //        for(Customer c : customers) {
 //            System.out.println(c);
 //            System.out.println("****");
