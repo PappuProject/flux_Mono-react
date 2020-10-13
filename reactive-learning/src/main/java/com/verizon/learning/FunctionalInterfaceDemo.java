@@ -1,5 +1,7 @@
 package com.verizon.learning;
 
+import java.util.stream.Stream;
+
 public class FunctionalInterfaceDemo {
 
 
@@ -14,18 +16,18 @@ public class FunctionalInterfaceDemo {
         java.util.function.Supplier<String> f5 = () -> new String("Shakir");
 
 
+        Stream<String> clients = Stream.of("Nomura", "Verizon", "IBM");
+
+
+
 
 //        java.util.function.Function<String, Integer> f1 = x -> x.length();
 //        java.util.function.Function<String, Integer> f1 = x -> x.length();
 //        java.util.function.Function<String, Integer> f1 = x -> x.length();
 //
-
-
         TaxCalculator t1 = (x, y) -> {
-
             return 19;
         };
-
         generateTaxSlips(t1);
 
 
