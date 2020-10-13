@@ -28,6 +28,17 @@ public class DataBuider implements CommandLineRunner {
 
         List<Customer> customers = this.customerData();
 
+        customerRepo
+                .deleteAll()
+                .thenMany(Flux.fromIterable(customers))
+                .flatMap(x -> {
+                    Mono<Customer> newlyAddedCustomer = customerRepo.save(x);
+                    return newlyAddedCustomer;
+                })
+                .thenMany(customerRepo.findAll())
+                .subscribe(x -> {
+                    System.out.println(x);
+                });
 
 
 //
