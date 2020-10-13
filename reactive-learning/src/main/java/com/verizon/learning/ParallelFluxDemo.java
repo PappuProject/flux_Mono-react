@@ -12,6 +12,9 @@ public class ParallelFluxDemo {
 
     public static void main(String[] args) throws InterruptedException {
 
+        System.out.println("The number of cores is : "
+                + Runtime.getRuntime().availableProcessors());
+
         List<String> clients =
                 Arrays.asList("Verizon",
                         "BNP Paribas",
@@ -35,7 +38,7 @@ public class ParallelFluxDemo {
                         e.printStackTrace();
                     }
 
-                    System.out.println(x  + " being transformed in : " + Thread.currentThread().getName());
+                    System.out.println(x + " being transformed in : " + Thread.currentThread().getName());
                     cdl.countDown();
                     return x.toLowerCase();
                 })
