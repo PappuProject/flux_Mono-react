@@ -1,7 +1,9 @@
 package com.verizon.learning.controllers;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +13,7 @@ import com.verizon.learning.valueobjects.Customer;
 import com.verizon.learning.valueobjects.CustomerAddress;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.GroupedFlux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -85,20 +88,17 @@ public class InvoiceCustomerAddressesRestController {
 	}
 
 	/**
-	 * a) the customer by customerId
-	 * b) the postalAddresses by customerId
-	 * c) the deliveryAddresses by customerId
+	 * a) the customer by customerId b) the postalAddresses by customerId c) the
+	 * deliveryAddresses by customerId
 	 * 
-	 * requirement : customer > 
-	 * 				and its respective postalAddresses + deliveryAddresses
+	 * requirement : customer > and its respective postalAddresses +
+	 * deliveryAddresses
 	 * 
 	 */
-	
-	@GetMapping (path ="/customer-address-map")
+
+	@GetMapping(path = "/customer-address-map")
 	public Flux<Customer> handleGetCustomerAddressesMap() {
-		
-		
-		
+
 //		Mono<Customer> monoCustomer =
 //				   APIUtil.getCustomerByCustomerId(customerId)
 //				   		  .zipWhen(customer -> {
@@ -109,7 +109,7 @@ public class InvoiceCustomerAddressesRestController {
 //				   			  return postalAddress.collectList();
 //				   			  
 //				   		  });
-		
+
 //		Mono<Tuple2<Customer, List<CustomerAddress>>>
 //			monoCustomer =
 //				APIUtil.getCustomerByCustomerId(customerId)
@@ -156,7 +156,63 @@ public class InvoiceCustomerAddressesRestController {
 		 
 		// @formatter:on
 		return customers;
-		
 	}
+
+	@GetMapping (path ="/grouped-addresses")
+	public Flux<Map<String, List<CustomerAddress>>> handleGetGroupedAddresses() {
+		
+		// @formatter:off
+
+		/*
+		 * onNext(["101", [ address1, address2 , address3   ]]
+		 * onNext(["102", [ address102, address102 ]]
+		 */
+		List<String> ids = Arrays.asList("101", "102", "103", "104", "105");
+		
+		// All the customerAddresses
+		Flux<CustomerAddress> allAddresses = 
+				 Flux.fromIterable(ids)
+				      .flatMap(id -> {
+				    	  
+				    	  return 
+					    	  Flux.merge(this.getDeliveryAddressesByCustomerId(id),
+					    			    this.getPostalAddressesByCustomerId(id));
+				    			  
+				    	  
+				      });
+		
+		// Grouping
+	    Flux<GroupedFlux<String, CustomerAddress>>	
+		    groupedFlux = 
+		    		allAddresses
+					   .groupBy(x -> x.getCustomerId());
+					
+		
+	    // map / flatMap 
+	    // (transform GroupedFlux into Map<String, List<CustomerAddress>)
+	    
+
+	    
+	    Flux<Map<String, List<CustomerAddress>>> groupedAddresses =
+			groupedFlux
+		       .flatMap(groupedId -> 		
+		       
+		    	   		groupedId
+		    	   		   .collectList()
+		    	   		   .map(listOfAddresses -> {
+			    	   			Map<String, List<CustomerAddress>> m1 = new HashMap<>();
+			    	   			m1.put(groupedId.key(), listOfAddresses);
+			 		    	    return m1;
+		    	   		 })
+		    );
+		 
+		// @formatter:on
+
+		return groupedAddresses;
+	}
+	
+	
+	
+	
 
 }
