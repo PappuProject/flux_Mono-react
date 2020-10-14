@@ -16,7 +16,7 @@ public class ConcatAndMergeDemo {
 				             .doOnNext(x -> {
 				            	
 				            	 try {
-									Thread.sleep(1000);
+									Thread.sleep(501);
 								} catch (InterruptedException e) {
 									// TODO Auto-generated catch block
 									e.printStackTrace();
@@ -28,6 +28,7 @@ public class ConcatAndMergeDemo {
 
 		Flux<Integer> f2 = Flux
 							.range(20, 5)
+							.publishOn(Schedulers.elastic())
 							.doOnNext(x -> {
 								try {
 									Thread.sleep(500);
@@ -47,7 +48,7 @@ public class ConcatAndMergeDemo {
 //			System.out.println(x);
 //		});
 		
-		Flux<Integer> f3 = Flux.merge(f1, f2);
+		Flux<Integer> f3 = Flux.concat(f1, f2);
 		
 		f3.subscribe(x -> {
 			System.out.println(x);

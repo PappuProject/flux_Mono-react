@@ -64,14 +64,23 @@ public class InvoiceCustomerAddressesRestController {
 	
 	@GetMapping(path = "/inv-customer-addresses")
 	public Flux<CustomerAddress> handleGetAddresses() {
+		
+		
 		List<String> ids = Arrays.asList("101", "103", "105");
 		// @formatter:off
-		Flux<CustomerAddress> addresses=
+		Flux<CustomerAddress> postalAddresses =
+				
 				Flux.fromIterable(ids)
 				.flatMap(this::getPostalAddressesByCustomerId);
+
+		Flux<CustomerAddress> deliveryAddresses =
+				
+				Flux.fromIterable(ids)
+				.flatMap(this::getDeliveryAddressesByCustomerId);
 		// @formatter:on				
 		
 		
+		Flux<CustomerAddress> addresses = Flux.merge(postalAddresses, deliveryAddresses);
 		
 		return addresses;				
 	}
