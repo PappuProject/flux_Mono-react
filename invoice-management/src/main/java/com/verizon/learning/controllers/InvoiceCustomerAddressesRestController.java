@@ -15,10 +15,9 @@ import reactor.core.publisher.Mono;
 
 @RestController
 public class InvoiceCustomerAddressesRestController {
-	
+
 	WebClient webClient = WebClient.create("http://localhost:8080");
-	
-	
+
 	private Flux<CustomerAddress> getPostalAddressesByCustomerId(String customerId) {
 		// @formatter:off
 		return
@@ -35,7 +34,7 @@ public class InvoiceCustomerAddressesRestController {
 			    .bodyToFlux(CustomerAddress.class);
 		// @formatter:on		
 	}
-	
+
 	private Flux<CustomerAddress> getDeliveryAddressesByCustomerId(String customerId) {
 		// @formatter:off
 		return
@@ -61,13 +60,12 @@ public class InvoiceCustomerAddressesRestController {
 				Flux.fromIterable(ids)
 				    .flatMap(this::getPostalAddressesByCustomerId);
 		// @formatter:on				
-		return addresses;				
+		return addresses;
 	}
-	
+
 	@GetMapping(path = "/inv-customer-addresses")
 	public Flux<CustomerAddress> handleGetAddresses() {
-		
-		
+
 		List<String> ids = Arrays.asList("101", "103", "105");
 		// @formatter:off
 		Flux<CustomerAddress> postalAddresses =
@@ -80,26 +78,26 @@ public class InvoiceCustomerAddressesRestController {
 				Flux.fromIterable(ids)
 				.flatMap(this::getDeliveryAddressesByCustomerId);
 		// @formatter:on				
-		
-		
+
 		Flux<CustomerAddress> addresses = Flux.merge(postalAddresses, deliveryAddresses);
-		
-		return addresses;				
+
+		return addresses;
 	}
-	
+
 	/**
 	 * a) the customer by customerId
 	 * b) the postalAddresses by customerId
 	 * c) the deliveryAddresses by customerId
 	 * 
-	 * requirement : customer > and its respective postalAddresses
+	 * requirement : customer > 
+	 * 				and its respective postalAddresses + deliveryAddresses
 	 * 
 	 */
 	
 	@GetMapping (path ="/customer-address-map")
-	public Mono<Customer> handleGetCustomerAddressesMap() {
+	public Flux<Customer> handleGetCustomerAddressesMap() {
 		
-		String customerId = "103";
+		
 		
 //		Mono<Customer> monoCustomer =
 //				   APIUtil.getCustomerByCustomerId(customerId)
@@ -124,34 +122,41 @@ public class InvoiceCustomerAddressesRestController {
 //						
 //					});
 //		
-		Mono<Customer>
-			monoCustomer =
-				APIUtil.getCustomerByCustomerId(customerId)
-				.zipWhen(customer -> {
-					
-					Flux<CustomerAddress> postalAddress = 
-							this.getPostalAddressesByCustomerId(customer.getId());
-					
-					return postalAddress.collectList();
-					
-				})
-				.map(x -> {
-					
-					Customer c = x.getT1();
-					List<CustomerAddress> addresses = x.getT2();
-					c.setAddresses(addresses);
-					return c;
-				});
+		// @formatter:off
+		//String customerId = "103";
+		
+		List<String> ids = Arrays.asList("101", "103", "105");
+		Flux<Customer> customers = 
+		
+				Flux.fromIterable(ids)
+				.flatMap(y -> {
+					return 
+						APIUtil.getCustomerByCustomerId(y)
+						.zipWhen(customer -> {
+							
+							Flux<CustomerAddress> postalAddress = 
+									this.getPostalAddressesByCustomerId(customer.getId());
+							Flux<CustomerAddress> deliveryAddress = 
+									this.getDeliveryAddressesByCustomerId(customer.getId());
+							
+							return 
+									Flux.merge(postalAddress, deliveryAddress)
+										.collectList();
+							
+						})
+						.map(x -> {
+							
+							Customer c = x.getT1();
+							List<CustomerAddress> addresses = x.getT2();
+							c.setAddresses(addresses);
+							return c;
+						});
+					});
 				
-					   		  
-		
-		
-		return monoCustomer;
+		 
+		// @formatter:on
+		return customers;
 		
 	}
-	
-	
-	
-	
 
 }
