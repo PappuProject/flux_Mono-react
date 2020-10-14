@@ -8,6 +8,6 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface CustomerAddressRepository extends ReactiveMongoRepository<CustomerAddress, String> {
 
-	Flux<CustomerAddress> findByCustomerId(String customerId);
+	Flux<CustomerAddress> findByCustomerIdAndType(String customerId, String type);
 
 }
