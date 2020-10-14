@@ -17,21 +17,7 @@ public class InvoiceRestController {
 
 	WebClient webClient = WebClient.create("http://localhost:8080");
 
-	private Mono<Customer> getCustomerByCustomerId(String customerId) {
-
-		// @formatter:off
-
-		Mono<Customer> customer = webClient
-				   .get()
-				   .uri("/customers/{customerId}", customerId)
-				   .retrieve()
-				   .bodyToMono(Customer.class);
-				
-				return customer;
-				 
-		// @formatter:on
-
-	}
+	
 
 	@GetMapping(path = "/invoice-customers")
 	public Flux<Customer> handleGetInvoiceCustomers() {
@@ -60,7 +46,7 @@ public class InvoiceRestController {
 		
 		Flux<Customer> customers =	
 				Flux.fromIterable(ids)
-					.flatMap(this::getCustomerByCustomerId);
+					.flatMap(APIUtil::getCustomerByCustomerId);
 		 
 		// @formatter:on
 

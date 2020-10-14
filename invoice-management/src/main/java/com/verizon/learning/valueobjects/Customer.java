@@ -1,13 +1,14 @@
 package com.verizon.learning.valueobjects;
 
+import java.util.List;
+
 public class Customer {
 
 	private String id;
 
 	private String name;
-//
-//    private CustomerAddress deliverAddress;
-//    private List<CustomerAddress> addresses;
+
+	private List<CustomerAddress> addresses;
 
 	public Customer() {
 
@@ -42,14 +43,13 @@ public class Customer {
 		this.name = name;
 	}
 
-//
-//    public List<CustomerAddress> getAddresses() {
-//        return addresses;
-//    }
-//
-//    public void setAddresses(List<CustomerAddress> addresses) {
-//        this.addresses = addresses;
-//    }
+	public List<CustomerAddress> getAddresses() {
+		return addresses;
+	}
+
+	public void setAddresses(List<CustomerAddress> addresses) {
+		this.addresses = addresses;
+	}
 
 	@Override
 	public String toString() {

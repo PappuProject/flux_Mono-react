@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.verizon.learning.valueobjects.Customer;
 import com.verizon.learning.valueobjects.CustomerAddress;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class InvoiceCustomerAddressesRestController {
@@ -84,6 +86,72 @@ public class InvoiceCustomerAddressesRestController {
 		
 		return addresses;				
 	}
+	
+	/**
+	 * a) the customer by customerId
+	 * b) the postalAddresses by customerId
+	 * c) the deliveryAddresses by customerId
+	 * 
+	 * requirement : customer > and its respective postalAddresses
+	 * 
+	 */
+	
+	@GetMapping (path ="/customer-address-map")
+	public Mono<Customer> handleGetCustomerAddressesMap() {
+		
+		String customerId = "103";
+		
+//		Mono<Customer> monoCustomer =
+//				   APIUtil.getCustomerByCustomerId(customerId)
+//				   		  .zipWhen(customer -> {
+//				   			  
+//				   			  Flux<CustomerAddress> postalAddress = 
+//				   					  this.getPostalAddressesByCustomerId(customer.getId());
+//				   			  
+//				   			  return postalAddress.collectList();
+//				   			  
+//				   		  });
+		
+//		Mono<Tuple2<Customer, List<CustomerAddress>>>
+//			monoCustomer =
+//				APIUtil.getCustomerByCustomerId(customerId)
+//					.zipWhen(customer -> {
+//						
+//						Flux<CustomerAddress> postalAddress = 
+//								this.getPostalAddressesByCustomerId(customer.getId());
+//						
+//						return postalAddress.collectList();
+//						
+//					});
+//		
+		Mono<Customer>
+			monoCustomer =
+				APIUtil.getCustomerByCustomerId(customerId)
+				.zipWhen(customer -> {
+					
+					Flux<CustomerAddress> postalAddress = 
+							this.getPostalAddressesByCustomerId(customer.getId());
+					
+					return postalAddress.collectList();
+					
+				})
+				.map(x -> {
+					
+					Customer c = x.getT1();
+					List<CustomerAddress> addresses = x.getT2();
+					c.setAddresses(addresses);
+					return c;
+				});
+				
+					   		  
+		
+		
+		return monoCustomer;
+		
+	}
+	
+	
+	
 	
 
 }
